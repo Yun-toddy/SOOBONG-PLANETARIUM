@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>은하언덕 수봉 : SOOBONG PLANETARIUM</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Hahmlet:wght@200;300;400&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--deep:#0D1025;--navy:#161A38;--pur:#756CC9;--lav:#A99BE8;--star:#FFF4CD;--moon:#F7F7FA;--gray:#A5A7B5;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px);background:var(--deep)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--deep);color:var(--moon);font:300 17px/1.85 'Noto Sans KR','Pretendard','Apple SD Gothic Neo',sans-serif;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;z-index:60;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+nav{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 14px) 5vw 14px;font-size:14px;letter-spacing:.12em;background:linear-gradient(var(--deep),transparent)}
+nav a{color:var(--moon);text-decoration:none;margin-left:20px;opacity:.8}nav a:first-child{margin:0;opacity:1}
+section{position:relative;padding:16vh 6vw}
+.eyebrow{font-size:14px;letter-spacing:.32em;color:var(--lav);margin-bottom:1.4rem}
+h1,h2{font-weight:200;line-height:1.5}h2{font-size:clamp(1.7rem,3.6vw,2.8rem)}
+p.lead{max-width:30em;color:var(--moon);opacity:.88}
+.btn{min-height:48px;padding:12px 30px;background:transparent;border:1px solid rgba(255,244,205,.55);color:var(--star);font:400 16px 'Noto Sans KR',sans-serif;letter-spacing:.1em;cursor:pointer;transition:transform .6s,box-shadow .6s,background .6s}
+.btn:hover:not(:disabled){transform:scale(1.03);box-shadow:0 0 24px rgba(255,244,205,.25)}
+.btn.solid{background:var(--star);color:var(--deep);border-color:var(--star)}.btn:disabled{opacity:.35;cursor:default}
+.pill{min-height:40px;padding:6px 18px;border-radius:99px;background:rgba(22,26,56,.7);border:1px solid rgba(169,155,232,.4);color:var(--moon);font:300 14px 'Noto Sans KR',sans-serif;letter-spacing:.08em;cursor:pointer;transition:.5s}
+.pill.on{background:var(--pur);border-color:var(--lav)}
+.btn:focus-visible,.pill:focus-visible,.st:focus-visible,input:focus-visible{outline:2px solid var(--lav);outline-offset:3px}
+#hero{height:100svh;min-height:520px;padding:0;text-align:center}
+canvas.bg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sc{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:1.4rem;opacity:0;transition:opacity 2.2s;pointer-events:none;padding:0 6vw}
+.sc.on{opacity:1;pointer-events:auto}.sc h1{font-size:clamp(1.5rem,4vw,3rem)}
+.logo{font-size:clamp(2rem,6vw,4.4rem);font-weight:200;letter-spacing:.14em;line-height:1.3}.logo small{display:block;font-size:.3em;letter-spacing:.5em;color:var(--lav);margin-top:.8rem}
+.sub{color:var(--gray);letter-spacing:.1em}
+#concept{min-height:100svh;background:linear-gradient(var(--deep),var(--navy))}
+#sk{position:absolute;left:0;right:0;bottom:0;width:100%;height:55%}
+
+.copy{position:relative;z-index:2}.copy p{margin-bottom:1.6rem}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2rem;margin:3rem 0;max-width:1000px}
+.steps li{border-top:1px solid rgba(169,155,232,.5);padding-top:1rem}.steps b{display:block;font-weight:400;letter-spacing:.2em;color:var(--star);font-size:15px}
+#stage{display:none;position:relative;height:100svh;min-height:560px;margin:0 -6vw;background:radial-gradient(ellipse at 50% 100%,var(--navy),var(--deep) 70%)}
+#stage.on{display:block}#sky{position:absolute;inset:0;width:100%;height:100%}
+.top{position:absolute;top:12px;left:0;right:0;z-index:3;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:0 12px}
+.hud{position:absolute;bottom:0;left:0;right:0;z-index:3;text-align:center;padding:60px 16px calc(env(safe-area-inset-bottom,0px) + 18px);background:linear-gradient(transparent,var(--deep) 55%)}
+.cnt{letter-spacing:.24em;font-size:14px;color:var(--lav)}.cnt b{color:var(--star);font-weight:400;font-size:20px}
+#hint{margin:6px 0 14px;min-height:1.8em}.acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#prog{display:flex;gap:6px;justify-content:center;margin-top:14px;font-size:13px;letter-spacing:.18em}#prog i{font-style:normal;padding-top:6px;border-top:2px solid rgba(165,167,181,.3);color:var(--gray);flex:0 1 90px}#prog i.on{border-color:var(--star);color:var(--star)}
+.st{cursor:pointer;animation:tw var(--d,7s) var(--dl,0s) ease-in-out infinite}.hit{fill:transparent}.gl{fill:url(#gg);opacity:0;transition:opacity .5s}.dot{fill:var(--gray);opacity:.55;transition:.5s}
+.st:hover .dot,.st:focus .dot{fill:#fff;opacity:1}.st:hover .gl{opacity:.6}.st.sel{animation:none}.st.sel .dot{fill:var(--star);opacity:1}.st.sel .gl{opacity:.85;animation:pulse 2.8s ease-in-out infinite}
+.rip{fill:none;stroke:var(--star);stroke-width:1;animation:rip 1s ease-out forwards}
+.lb{fill:var(--lav);font-size:14px;text-anchor:middle}
+.ln{stroke:var(--star);stroke-width:1.5;stroke-opacity:.75;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.3s ease forwards;filter:drop-shadow(0 0 3px rgba(255,244,205,.7))}
+@keyframes draw{to{stroke-dashoffset:0}}@keyframes tw{50%{opacity:.5}}@keyframes pulse{50%{opacity:.35;transform:scale(1.25)}}@keyframes rip{from{r:4;opacity:.9}to{r:34;opacity:0}}
+.sky .st{transform-box:fill-box}.st circle{transform-box:fill-box;transform-origin:center}
+.ov{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:rgba(13,16,37,.96);opacity:0;pointer-events:none;transition:opacity 1.2s;overflow:auto;padding:20px}
+.ov.on{opacity:1;pointer-events:auto}
+.nmbox{text-align:center;max-width:520px;width:100%;display:grid;gap:1rem;justify-items:center}
+#pv{width:min(300px,70vw);height:min(300px,70vw);overflow:visible}#pv .ln{stroke-width:.6}#pv circle{fill:var(--star);filter:drop-shadow(0 0 2px var(--star))}
+input{width:100%;background:transparent;border:0;border-bottom:1px solid var(--lav);color:var(--star);font:300 20px 'Noto Sans KR',sans-serif;padding:10px 4px;text-align:center}
+input::placeholder{color:var(--gray);opacity:.8}
+.rs{position:absolute;display:grid;place-items:center;transition:opacity 1.4s}#rv.done .rs{opacity:0;pointer-events:none}
+#rvs{width:min(320px,70vw)}#rvs .ln{stroke-width:.6}#rvs circle{fill:var(--star)}#rvs .ex{opacity:0;animation:fi 2s 2s forwards}
+@keyframes fi{to{opacity:.7}}
+.card{opacity:0;transition:opacity 2s 1s;display:grid;gap:14px;justify-items:center}#rv.done .card{opacity:1}
+.card canvas{max-height:68svh;max-width:88vw;aspect-ratio:4/5;box-shadow:0 0 60px rgba(117,108,201,.35)}
+#galaxy{padding:0;height:100svh;min-height:560px;border-top:1px solid rgba(169,155,232,.2)}#gc{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
+.gtop{position:absolute;top:calc(env(safe-area-inset-top,0px) + 64px);left:5vw;right:5vw;pointer-events:none}.gtop *{pointer-events:auto}
+.flt{display:flex;gap:8px;flex-wrap:wrap}
+.gcount{position:absolute;left:5vw;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);pointer-events:none;font-size:14px;letter-spacing:.2em;color:var(--lav)}.gcount b{display:block;font-weight:200;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--star);letter-spacing:.06em;line-height:1.2}
+#gmsg{letter-spacing:.04em;color:var(--moon);transition:opacity 1.5s;opacity:0;margin-top:6px;font-size:15px}
+#tip{position:fixed;z-index:40;pointer-events:none;background:rgba(13,16,37,.85);border:1px solid rgba(169,155,232,.4);padding:8px 14px;font-size:15px;opacity:0;transition:opacity .3s;line-height:1.5}
+#memories{min-height:110svh;overflow:hidden;text-align:center}
+.mwin{height:70svh;overflow:hidden;margin-top:2rem;-webkit-mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent)}
+#mf{animation:up 90s linear infinite}@keyframes up{to{transform:translateY(-50%)}}
+#mf p{width:fit-content;max-width:86vw;margin:0 auto 3.4rem;color:var(--moon);opacity:.85}#mf p:nth-child(3n+1){margin-left:8vw}#mf p:nth-child(3n+2){margin-left:auto;margin-right:9vw}
+#mf p::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--star);box-shadow:0 0 8px var(--star);margin-right:14px;vertical-align:middle}
+.flow{display:flex;flex-wrap:wrap;gap:10px 0;align-items:center;margin:2.4rem 0;max-width:1000px}.flow span{padding:4px 0}.flow span:not(:last-child)::after{content:"→";margin:0 14px;color:var(--lav)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:3rem;max-width:1000px;margin:2.4rem 0}.two h3{font-weight:400;letter-spacing:.24em;font-size:15px;color:var(--lav);margin-bottom:.8rem}.two ol{padding-left:1.2rem}.two .af{color:var(--star)}
+dl{display:grid;grid-template-columns:120px 1fr;gap:.6rem 1.4rem;max-width:760px;margin-top:2.6rem;border-top:1px solid rgba(169,155,232,.3);padding-top:1.6rem}dt{color:var(--lav);letter-spacing:.2em;font-size:14px;padding-top:3px}dd{font-size:16px}
+#final{height:100svh;min-height:560px;padding:0;text-align:center;display:grid;place-items:center}#final .in{position:relative;z-index:2;display:grid;gap:1.4rem;justify-items:center;padding:0 6vw}
+#md{background:rgba(13,16,37,.9)}#md canvas{max-height:78svh;max-width:90vw;aspect-ratio:4/5;display:block}
+footer{text-align:center;padding:30px;color:var(--gray);font-size:14px}
+@media(max-width:640px){nav a:nth-child(n+3){display:none}section{padding:14vh 7vw}dl{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}#mf{animation:none}}
+:root{--serif:'Noto Serif KR','Nanum Myeongjo',serif;--en:'Cormorant Garamond','Noto Serif KR',serif}
+nav,.eyebrow,.cnt,#prog i,dt,.two h3,.gcount{font-family:var(--en);font-weight:400}
+nav{font-size:15px;letter-spacing:.2em}.eyebrow{font-size:17px;letter-spacing:.36em}.cnt{font-size:16px}.cnt b{font-family:var(--en);font-size:26px;font-weight:400}#prog i{font-size:15px}dt{font-size:16px}.two h3{font-size:17px}.gcount{font-size:16px}.gcount b{font-family:var(--en);font-weight:300;font-size:clamp(2.2rem,4.6vw,3.4rem)}
+h1,h2,.logo,#hint,.sub,#mf p,.nmbox>p{font-family:var(--serif)}
+h1,h2{font-weight:200;line-height:1.7;letter-spacing:.03em}#hint{font-weight:300;font-size:18px}
+.logo{font-weight:200;letter-spacing:.2em}.logo small{font-family:var(--en);font-style:italic;font-weight:300;letter-spacing:.5em;font-size:.36em}
+.sub{font-weight:300;letter-spacing:.2em}#mf p{font-weight:300;font-size:19px}
+.sc{z-index:2}
+#hsk{position:absolute;left:0;right:0;bottom:0;width:100%;height:24%;fill:#080A1B;z-index:1;pointer-events:none}
+#hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 85% 16% at 50% 100%,rgba(255,200,120,.2),transparent),radial-gradient(ellipse 130% 75% at 50% 118%,rgba(117,108,201,.3),transparent 62%),radial-gradient(ellipse at 50% 40%,transparent 48%,rgba(6,8,22,.75) 100%)}
+#galaxy{background:linear-gradient(112deg,transparent 28%,rgba(117,108,201,.13) 50%,transparent 72%),var(--deep)}
+#galaxy::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(8,10,26,.88) 100%)}.gtop,.gcount{z-index:2}
+:root{--serif:'Hahmlet','Noto Serif KR',serif;--en:'Cinzel','Hahmlet',serif;--hand:'Nanum Pen Script','Gowun Batang',cursive}
+nav{font-size:13px;letter-spacing:.22em}.eyebrow{font-size:14px;letter-spacing:.32em}.cnt{font-size:14px}.cnt b{font-size:24px}#prog i{font-size:13px;letter-spacing:.08em;flex:0 1 100px}dt{font-size:14px}.two h3{font-size:15px}.gcount{font-size:14px}.gcount b{font-weight:400;font-size:clamp(1.9rem,4vw,3rem)}
+.logo small{font-family:var(--en);font-style:normal;font-weight:400;letter-spacing:.5em;font-size:.32em}
+h1,h2{font-weight:200}
+.btn,.pill{font-family:var(--serif);font-weight:300;letter-spacing:.12em}
+#mf p{font-family:var(--hand);font-size:28px;line-height:1.5}#memIn{font-family:var(--hand);font-size:26px}#nameIn{font-family:var(--serif);font-weight:300}
+#concept{overflow:hidden}
+#sk{height:max(44vw,320px)}#sk .tw{animation:tw 7s ease-in-out infinite}#sk .rv,#sk .b{opacity:var(--p,0)}
+.b{fill:#0B0E22;stroke:rgba(247,247,250,.55);stroke-width:.8}#hsk .b{fill:#080A1B;stroke:rgba(169,155,232,.3)}
+.w{fill:none;stroke:#FFF4CD;stroke-width:2.6;stroke-linecap:round;stroke-opacity:.5}.w.hi{stroke-opacity:1;animation:tw 6s ease-in-out infinite}
+.fg{fill:#0B0E22;stroke:#F7F7FA;stroke-width:1.1}
+.jf{animation:fl 9s ease-in-out infinite}@keyframes fl{50%{transform:translateY(-12px)}}
+.gl{animation:gl 7s steps(1) infinite}@keyframes gl{0%,90%{transform:none;opacity:.9}92%{transform:translateX(8px);opacity:.3}95%{transform:translateX(-5px);opacity:1}}
+.hud2{position:absolute;right:6vw;top:22vh;width:150px;z-index:2;font:13px/1.9 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;border:1px solid rgba(247,247,250,.7);background:rgba(13,16,37,.4)}.hud2 svg{display:block;width:100%}.hud2 div{display:flex;align-items:center;gap:8px;border-top:1px solid rgba(247,247,250,.7);padding:0 8px}.hud2 b{width:10px;height:10px;background:#F7F7FA}@media(max-width:900px){.hud2{display:none}}
+a.btn{display:inline-flex;align-items:center;text-decoration:none}
+#visit{background:linear-gradient(var(--deep),var(--navy));padding-bottom:12vh}.vgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:5vw;align-items:center;max-width:1100px;margin:0 auto}
+.vmap{border:1px solid rgba(169,155,232,.45);background:var(--deep)}.vmap svg{display:block;width:100%}#vm .tw{animation:tw 7s ease-in-out infinite}.pr{animation:pr 2.6s ease-out infinite}@keyframes pr{from{r:10;opacity:.9}to{r:34;opacity:0}}
+@media(max-width:800px){.vgrid{grid-template-columns:1fr}}
+</style></head><body>
+<nav><a href="#hero">SOOBONG PLANETARIUM</a><span><a href="#make">별자리 만들기</a><a href="#galaxy">수봉의 은하</a><a href="#visit">찾아오기</a></span></nav>
+
+<header id="hero"><canvas class="bg" id="hc" aria-hidden="true"></canvas><svg id="hsk" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+<div class="sc"><h1>도시의 불빛을<br>별이라고 생각해본 적 있나요?</h1></div>
+<div class="sc"><h1>수봉에서 바라본 인천의 밤은<br>또 하나의 은하가 됩니다.</h1></div>
+<div class="sc"><div class="logo">은하언덕 수봉<small>SOOBONG PLANETARIUM</small></div><p class="sub">“도시를 올라, 은하를 만나다.”</p><button class="btn" id="enter">은하에 입장하기</button></div></header>
+
+<section id="concept"><svg id="sk" viewBox="0 0 1000 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+<div class="hud2" aria-hidden="true"><svg viewBox="0 0 120 92"><path d="M0 23H120M0 46H120M0 69H120M30 0V92M60 0V92M90 0V92" stroke="rgba(247,247,250,.25)" stroke-width=".6" fill="none"/><circle cx="60" cy="46" r="24" fill="url(#mg)"/></svg><div><b></b>CITY LIGHT</div><div><b></b>수봉공원 · INCHEON</div></div>
+<div class="copy"><p class="eyebrow">THE CITY BECOMES A GALAXY</p>
+<h2>수봉산에서 내려다본 도시에는<br>수많은 작은 빛이 존재합니다.</h2><br>
+<p class="lead">누군가의 집,<br>늦은 밤을 밝히는 가게,<br>길을 달리는 자동차,<br>그리고 우리가 살아가는 공간.</p>
+<p class="lead">은하언덕 수봉은<br>그 작은 도시의 빛을 별이라고 부릅니다.</p></div></section>
+
+<section id="make"><p class="eyebrow">MAKE YOUR CONSTELLATION</p>
+<h2>오늘의 수봉에서<br>당신의 별을 발견해주세요.</h2>
+<ol class="steps"><li><b>01 SELECT</b>빛을 선택하고</li><li><b>02 CONNECT</b>서로 연결하고</li><li><b>03 REMEMBER</b>이름과 기억을 남기고</li><li><b>04 SHINE</b>수봉의 은하에 별자리를 남깁니다.</li></ol>
+<button class="btn solid" id="start">나의 수봉자리 만들기</button>
+<div id="stage"><svg id="sky" role="group" aria-label="별자리 캔버스"></svg>
+<div class="top"><button class="pill on" data-mode="solo">나만의 별자리</button><button class="pill" data-mode="fam">우리 가족 별자리</button><span style="width:100%"></span><button class="pill on" data-v="0">01 CITY GALAXY</button><button class="pill" data-v="1">02 NIGHT WALK</button><button class="pill" data-v="2">03 SOOBONG VIEW</button></div>
+<div class="hud"><div class="cnt">SELECT YOUR LIGHTS <b id="n">0</b> / 7</div><p id="hint" aria-live="polite"></p>
+<div class="acts"><button class="btn" id="bConn">별 연결하기</button><button class="btn solid" id="bDone">별자리 완성</button><button class="btn" id="bReset">처음부터</button></div>
+<div id="prog"><i>SELECT</i><i>CONNECT</i><i>REMEMBER</i><i>SHINE</i></div></div></div></section>
+
+<div class="ov" id="nm"><div class="nmbox"><svg id="pv" viewBox="0 0 100 100"></svg>
+<p>당신이 발견한 별자리에<br>이름을 붙여주세요.</p><input id="nameIn" maxlength="16" placeholder="예: 우리 가족자리, 11월의 별자리" aria-label="별자리 이름">
+<p>오늘의 기억을 한 줄로 남겨주세요.</p><input id="memIn" maxlength="50" placeholder="오랜만에 가족과 함께 걸었던 밤." aria-label="오늘의 기억 (최대 50자)">
+<button class="btn solid" id="bRev">별자리 공개하기</button></div></div>
+<div class="ov" id="rv"><div class="rs"><svg id="rvs" viewBox="0 0 100 100"></svg></div>
+<div class="card"><canvas id="cc" width="1080" height="1350" aria-label="완성된 별자리 카드"></canvas><div class="acts"><button class="btn solid" id="bReg">수봉의 은하에 등록하기</button><button class="btn" id="bImg">이미지로 저장</button><button class="btn" id="bAgain">다시 만들기</button></div></div></div>
+
+<section id="galaxy"><canvas id="gc" aria-label="수봉의 은하: 드래그해서 둘러보고 별자리를 눌러 보세요"></canvas>
+<div class="gtop"><p class="eyebrow">SOOBONG GALAXY</p><div class="flt" id="flt"><button class="pill on" data-f="ALL">ALL</button><button class="pill" data-f="TODAY">TODAY</button><button class="pill" data-f="FAMILY">FAMILY</button><button class="pill" data-f="MEMORY">MEMORY</button></div><button class="pill" id="rst" style="margin-top:10px">내 별자리 초기화</button></div>
+<div class="gcount">현재 수봉의 은하<b id="cnt">2,731</b>CONSTELLATIONS<p id="gmsg">오늘도 수봉의 은하는<br>조금 더 밝아졌습니다.</p></div></section>
+<div id="tip"></div><div class="ov" id="md"><div style="display:grid;gap:14px;justify-items:center"><canvas id="mc" aria-label="별자리 상세 카드"></canvas><button class="btn" id="mx">닫기</button></div></div>
+
+<section id="memories"><p class="eyebrow">MEMORIES BECOME STARS</p><h2>기억은 별이 되어<br>천천히 흘러갑니다.</h2><div class="mwin"><div id="mf"></div></div></section>
+
+<section id="exp"><p class="eyebrow">FROM SOOBONG TO THE GALAXY</p><h2>수봉을 찾은 한 사람의 기억이<br>온라인에서는 하나의 별로 남습니다.</h2>
+<div class="flow"><span>수봉 방문</span><span>도시의 빛 발견</span><span>나만의 별 선택</span><span>별자리 제작</span><span>기억 기록</span><span>온라인 플라네타리움 등록</span><span>수봉의 은하 완성</span></div>
+<p class="lead">현장의 QR 포인트 — VIEW 01 CITY GALAXY, VIEW 02 NIGHT WALK, VIEW 03 SOOBONG VIEW — 에서 각기 다른 별자리 캔버스가 열립니다. 이 데모에서는 별자리 만들기 화면에서 View를 직접 골라 볼 수 있습니다.</p>
+<div class="two"><div><h3>BEFORE</h3><ol><li>수봉 방문</li><li>야경 감상</li><li>사진</li><li>귀가</li></ol></div><div class="af"><h3>AFTER</h3><ol><li>수봉 방문</li><li>빛 발견</li><li>별 선택</li><li>별자리 제작</li><li>가족 기억 기록</li><li>온라인 은하 등록</li><li>공유</li><li>다시 방문하고 싶은 기억</li></ol></div></div>
+<h2 style="font-size:clamp(1.3rem,2.6vw,2rem)">야경을 보는 장소에서,<br>기억을 만드는 장소로.</h2>
+<dl><dt>PROJECT</dt><dd>은하언덕 수봉</dd><dt>CATEGORY</dt><dd>Place Branding · Visual Communication · UX/UI · Tourism Experience Design</dd><dt>CONCEPT</dt><dd>Urban Light → Star → Constellation → Memory → Galaxy</dd><dt>TARGET</dt><dd>아이를 동반한 가족 관광객</dd><dt>GOAL</dt><dd>수봉공원의 야경을 단순한 경관이 아닌, 가족이 함께 발견하고 기록하는 관광 경험으로 전환한다.</dd></dl></section>
+
+<section id="final"><canvas class="bg" id="fc" aria-hidden="true"></canvas><div class="in"><h2>한 사람의 기억은 별이 되고,<br><br>수많은 기억은<br>수봉의 은하가 됩니다.</h2><div class="logo" style="font-size:clamp(1.4rem,3vw,2.2rem)">은하언덕 수봉<small>SOOBONG PLANETARIUM</small></div><p class="sub">도시를 올라, 은하를 만나다.</p><button class="btn solid" id="again2">나의 별자리 만들기</button></div></section>
+<section id="visit"><div class="vgrid"><div><p class="eyebrow">VISIT SOOBONG</p><h2>수봉에서<br>직접 만나요.</h2>
+<dl><dt>ADDRESS</dt><dd>인천 미추홀구 수봉안길 84 (숭의동)</dd><dt>COORDINATE</dt><dd>약 N 37.46° · E 126.66° (대략적인 위치)</dd><dt>OPEN</dt><dd>상시 개방 · 무료</dd><dt>ACCESS</dt><dd>수도권 전철 1호선 도화역 2번 출구에서 도보 약 15분</dd></dl>
+<div class="acts" style="justify-content:flex-start;margin-top:2rem"><a class="btn solid" href="https://map.naver.com/p/search/%EC%88%98%EB%B4%89%EA%B3%B5%EC%9B%90" target="_blank" rel="noopener">네이버 지도에서 열기</a><a class="btn" href="https://map.naver.com/p/search/%EC%9D%B8%EC%B2%9C%20%EB%AF%B8%EC%B6%94%ED%99%80%EA%B5%AC%20%EC%88%98%EB%B4%89%EC%95%88%EA%B8%B8%2084" target="_blank" rel="noopener">도로명 주소로 검색</a></div></div>
+<div class="vmap"><svg id="vm" viewBox="0 0 400 400" role="img" aria-label="수봉공원 위치 개념도"></svg></div></div></section>
+<footer>© 은하언덕 수봉 · SOOBONG PLANETARIUM — 온라인 전시 데모</footer>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],NS='http://www.w3.org/2000/svg';
+const rng=s=>()=>(s=(s*1664525+1013904223)>>>0)/4294967296,pad=(n,l=2)=>String(n).padStart(l,'0');
+const d0=new Date(),TODAY=d0.getFullYear()+'.'+pad(d0.getMonth()+1)+'.'+pad(d0.getDate()),BASE=2731;
+const store={get(){try{return JSON.parse(localStorage.getItem('soobong-c')||'[]')}catch(e){return[]}},set(v){try{localStorage.setItem('soobong-c',JSON.stringify(v))}catch(e){}}};
+const D=[['우리 가족자리','오랜만에 가족과 함께 걸었던 밤.'],['첫 번째 밤','아이와 처음으로 야경을 본 날.'],['엄마와 나','엄마와 오랜만에 같이 걸었다.'],['오늘의 산책','천천히 걷기 좋은 저녁이었다.'],['수봉 토끼자리','아이가 토끼 모양이라며 먼저 찾아냈다.'],['가을밤자리','바람이 선선해서 오래 앉아 있었다.'],['세 사람의 별','우리 셋의 첫 수봉 산책.'],['첫 수봉자리','처음 올라온 언덕, 생각보다 환했다.'],['우리의 밤','말없이 불빛만 바라보던 시간.'],['작은 별자리','작은 불빛 하나에도 이야기가 있었다.'],['밤산책자리','퇴근길에 문득 올라와 본 밤.'],['11월의 별','11월의 찬 공기가 좋았던 날.'],['다시 만난 밤','오랜 친구와 다시 걸었던 언덕.'],['수봉의 기억','오늘의 밤을 오래 기억하고 싶다.'],['오늘 여기','오늘 여기, 우리가 있었다.'],['함께 걷는 밤','손을 잡고 천천히 내려오던 길.'],['우리집 별자리','저기 우리집이 보인다며 웃었다.'],['도시의 별','저 불빛마다 누군가의 하루가 있다.'],['첫 야경','아이가 처음 야경을 보고 말을 잃었다.'],['은하 산책','도시가 은하처럼 보였던 저녁.']];
+const DEMO=D.map(([name,memory],i)=>{const R=rng(i*97+11),k=3+Math.floor(R()*5),pts=[];for(let j=0;j<k;j++)pts.push({x:Math.round(15+R()*70),y:Math.round(15+R()*70)});pts.sort((a,b)=>a.x-b.x);
+return{id:'SB-'+pad(BASE-19+i,6),no:BASE-19+i,name,memory,date:i%4==0?TODAY:'2026.11.'+pad(1+(i*3)%10),type:/가족|엄마|세 사람|우리/.test(name)?'family':'memory',pts}});
+
+/* 별빛 배경 (히어로 / 마지막 섹션) */
+function field(cv,o={}){const x=cv.getContext('2d');let W,H,S=[],C=null,m={x:-999,y:-999},run=1,cx,cy,RM,sh=null,nx=0;const t0=performance.now();
+function rs(){const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0);cx=W/2;cy=H*1.08;RM=Math.hypot(W/2,cy)+40;const R=rng(9);S=Array.from({length:Math.round(Math.PI*RM*RM/5500)},()=>{const q=Math.sqrt(R())*RM,t=R()*6.2832;return{dx:q*Math.cos(t),dy:q*Math.sin(t),r:R()*1.2+.3,p:R()*6.28,v:R()*.6+.2,d:(o.delay||0)+R()*5000,ox:0,oy:0}});
+ if(o.c){const Q=rng(4);C=DEMO.slice(0,10).map((c,i)=>({pts:c.pts,x:Q()*W,y:H*.1+Q()*H*.8,v:.12+Q()*.18}))}}
+rs();addEventListener('resize',rs);cv.parentElement.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();m.x=e.clientX-r.left;m.y=e.clientY-r.top});
+new IntersectionObserver(e=>run=e[0].isIntersecting).observe(cv);
+(function f(t){requestAnimationFrame(f);if(!run)return;x.clearRect(0,0,W,H);const e=t-t0;
+const ang=e*.000022,ca=Math.cos(ang),sa=Math.sin(ang),fi=Math.min(1,e/4000);
+x.save();x.translate(cx,cy);x.rotate(-.5+ang);const gd=x.createLinearGradient(0,-130,0,130);gd.addColorStop(0,'rgba(169,155,232,0)');gd.addColorStop(.5,'rgba(169,155,232,.1)');gd.addColorStop(1,'rgba(169,155,232,0)');x.globalAlpha=fi;x.fillStyle=gd;x.fillRect(-RM,-130,RM*2,260);x.restore();
+if(o.grid){x.globalAlpha=fi;x.strokeStyle='rgba(169,155,232,.11)';x.lineWidth=1;for(let k=1;k<=5;k++){x.beginPath();x.arc(cx,cy,RM*k/5,0,7);x.stroke()}x.beginPath();for(let k=0;k<12;k++){const a=k*Math.PI/6;x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*RM,cy+Math.sin(a)*RM)}x.stroke()}
+for(const s of S){const px=cx+s.dx*ca-s.dy*sa,py=cy+s.dx*sa+s.dy*ca;if(px<-20||px>W+20||py<-20||py>H+20)continue;const a=Math.min(1,Math.max(0,(e-s.d)/2500))*(.35+.65*(.5+.5*Math.sin(e/1000*s.v+s.p))),dx=px-m.x,dy=py-m.y,q=Math.hypot(dx,dy)||1,k=q<130?(1-q/130)*10/q:0;s.ox+=(dx*k-s.ox)*.06;s.oy+=(dy*k-s.oy)*.06;x.fillStyle=s.r>1?'#FFF4CD':'#F7F7FA';if(s.r>1.1){x.globalAlpha=a*.2;x.beginPath();x.arc(px+s.ox,py+s.oy,s.r*3.2,0,7);x.fill()}x.globalAlpha=a;x.beginPath();x.arc(px+s.ox,py+s.oy,s.r,0,7);x.fill()}
+if(!nx)nx=e+3500;if(!sh&&e>nx){sh={x:W*(.35+Math.random()*.6),y:H*Math.random()*.35,l:0};nx=e+8000+Math.random()*8000}if(sh){sh.l+=.025;const hx=sh.x-sh.l*320,hy=sh.y+sh.l*140,gr=x.createLinearGradient(hx,hy,hx+90,hy-39);gr.addColorStop(0,'rgba(255,244,205,.9)');gr.addColorStop(1,'rgba(255,244,205,0)');x.globalAlpha=Math.sin(Math.min(sh.l,1)*Math.PI);x.strokeStyle=gr;x.lineWidth=1.5;x.beginPath();x.moveTo(hx,hy);x.lineTo(hx+90,hy-39);x.stroke();if(sh.l>1)sh=null}
+if(C)for(const c of C){c.x+=c.v;if(c.x>W+120)c.x=-120;x.globalAlpha=.5;x.strokeStyle='#A99BE8';x.fillStyle='#FFF4CD';x.lineWidth=1;x.beginPath();c.pts.forEach((p,i)=>{const X=c.x+p.x*1.1,Y=c.y+p.y*1.1;i?x.lineTo(X,Y):x.moveTo(X,Y)});x.stroke();c.pts.forEach(p=>{x.beginPath();x.arc(c.x+p.x*1.1,c.y+p.y*1.1,2,0,7);x.fill()})}})(0)}
+field($('#hc'),{delay:1000,grid:1});field($('#fc'),{c:1,grid:1});
+const sc=$$('.sc');[1500,5500,9500].forEach((t,i)=>setTimeout(()=>{sc.forEach((s,j)=>s.classList.toggle('on',i==j))},t));
+$('#enter').onclick=()=>$('#concept').scrollIntoView();
+
+/* 도시 실루엣 */
+(function(){const R=rng(3);let h='',d='',x=0;while(x<1000){const w=24+R()*50,ht=50+R()*150;h+=`<rect x="${x|0}" y="${(300-ht)|0}" width="${w|0}" height="${ht|0}"/>`;for(let k=0;k<w*ht/300;k++)d+=`<circle cx="${(x+4+R()*(w-8)).toFixed(0)}" cy="${(300-ht+6+R()*(ht-10)).toFixed(0)}" r="${(.8+R()*1.4).toFixed(1)}" style="animation-delay:${(R()*6).toFixed(1)}s"/>`;x+=w+2+R()*10}
+for(let k=0;k<50;k++)d+=`<circle cx="${(R()*1000)|0}" cy="${(R()*120)|0}" r="${(.7+R()).toFixed(1)}" style="animation-delay:${(R()*6).toFixed(1)}s"/>`;
+scene();
+const sec=$('#concept'),sk=$('#sk');addEventListener('scroll',()=>{const r=sec.getBoundingClientRect();sk.style.setProperty('--p',Math.max(0,Math.min(1,(innerHeight*.9-r.top)/(innerHeight*.8))))},{passive:true})})();
+
+function bl(R,base,mh){let o='',a='',b='',x=-10;while(x<1010){const w=26+R()*44,h=40+R()*mh,y=base-h,t=R();o+=`M${x|0} ${base}V${y|0}H${(x+w)|0}V${base}`;if(t<.22)o+=`M${(x+w/2)|0} ${y|0}v-22`;else if(t<.5)o+=`M${(x+w*.2)|0} ${y|0}v-9h${(w*.6)|0}v9`;
+for(let cx=x+6;cx<x+w-4;cx+=7)for(let cy=y+8;cy<base-6;cy+=9){const r=R();if(r<.1)b+=`M${cx|0} ${cy|0}h.1`;else if(r<.42)a+=`M${cx|0} ${cy|0}h.1`}x+=w+1+R()*9}
+return `<path class="b" d="${o}"/><path class="w" d="${a}"/><path class="w hi" d="${b}"/>`}
+function scene(){const R=rng(3),P='M0 352C150 334 300 346 460 342S760 330 900 340S980 344 1000 342';
+let s='<defs><radialGradient id="mg" cx=".38" cy=".34" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#D9D4F8"/><stop offset="1" stop-color="#8A81CC"/></radialGradient><linearGradient id="gg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7E3FB"/><stop offset="1" stop-color="#8379C8"/></linearGradient><linearGradient id="hg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFC882" stop-opacity=".3"/><stop offset="1" stop-color="#FFC882" stop-opacity="0"/></linearGradient><filter id="b8" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter><filter id="b4" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="4"/></filter><clipPath id="mc"><circle cx="640" cy="125" r="86"/></clipPath></defs>';
+for(let k=0;k<80;k++)s+=`<circle class="tw" cx="${(R()*1000)|0}" cy="${(R()*260)|0}" r="${(.5+R()).toFixed(1)}" fill="${R()<.2?'#FFB6C9':'#F7F7FA'}" style="animation-delay:-${(R()*7).toFixed(1)}s"/>`;
+s+='<g class="rv"><circle cx="640" cy="125" r="104" fill="#FF8FB0" opacity=".3" filter="url(#b8)"/><circle cx="640" cy="125" r="86" fill="url(#mg)"/><g clip-path="url(#mc)"><g filter="url(#b4)" fill="#352C74" opacity=".3"><ellipse cx="610" cy="100" rx="22" ry="14"/><ellipse cx="668" cy="150" rx="26" ry="16"/><ellipse cx="640" cy="182" rx="40" ry="10"/><ellipse cx="690" cy="95" rx="12" ry="9"/><ellipse cx="600" cy="145" rx="14" ry="10"/></g></g><circle cx="640" cy="125" r="86" fill="none" stroke="#FFB6C9" stroke-opacity=".5" stroke-width="1.5"/></g>';
+s+='<rect x="0" y="230" width="1000" height="125" fill="url(#hg)"/>'+bl(R,350,120);
+s+=`<g class="rv"><path d="${P}V420H0Z" fill="url(#gg2)"/><g filter="url(#b4)" fill="#1B1640" opacity=".55"><ellipse cx="170" cy="396" rx="90" ry="8"/><ellipse cx="520" cy="408" rx="130" ry="7"/><ellipse cx="860" cy="392" rx="80" ry="7"/><ellipse cx="330" cy="384" rx="60" ry="5"/><ellipse cx="700" cy="378" rx="40" ry="4"/><ellipse cx="425" cy="381" rx="38" ry="4"/></g><path d="${P}" fill="none" stroke="#fff" stroke-opacity=".6"/>`;
+s+='<g class="fg" transform="translate(410 378)"><circle cx="0" cy="-48" r="6.5"/><path d="M-13 -38Q0 -45 13 -38L15 0H-15Z"/></g><g class="fg" transform="translate(442 378)"><circle cx="0" cy="-32" r="4.8"/><path d="M-9 -25Q0 -30 9 -25L10 0H-10Z"/></g></g>';
+const jf=(x,y,d)=>`<g transform="translate(${x} ${y})"><g class="jf" style="animation-delay:-${d}s"><circle r="16" fill="#FF9DB8" opacity=".35" filter="url(#b8)"/><circle r="4.5" fill="#fff"/><path d="M-3 5q-4 12 0 24t0 24M0 5q3 14-1 28t1 22M3 5q4 12 0 24t0 24" fill="none" stroke="#F7F7FA" stroke-opacity=".5" stroke-width=".8"/></g></g>`;
+s+=jf(478,300,1)+jf(525,268,4)+jf(378,296,7);
+s+='<g class="gl"><rect x="700" y="18" width="200" height="2" fill="#A99BE8" opacity=".8"/><rect x="760" y="23" width="70" height="1" fill="#FF6FA8"/><rect x="560" y="30" width="120" height="1.5" fill="#7FE0FF" opacity=".7"/><rect x="18" y="382" width="30" height="10" fill="#6C5CE7" opacity=".6"/><rect x="18" y="386" width="30" height="1" fill="#7FE0FF"/></g>';
+$('#sk').innerHTML=s;$('#hsk').innerHTML=bl(rng(8),300,90)}
+function vmap(){const R=rng(12);let s='<defs><radialGradient id="pg"><stop offset="0" stop-color="#FFF4CD"/><stop offset="1" stop-color="#FFF4CD" stop-opacity="0"/></radialGradient></defs>';
+for(let i=1;i<=6;i++)s+=`<ellipse cx="200" cy="185" rx="${i*26}" ry="${i*20}" transform="rotate(-18 200 185)" fill="none" stroke="#A99BE8" stroke-opacity="${(.55-i*.07).toFixed(2)}" stroke-width=".8"/>`;
+s+='<path d="M0 300C90 270 150 310 230 280S340 240 400 255M70 0C90 90 60 160 110 240S150 340 130 400M400 120C320 140 290 90 230 110S120 60 150 0M0 90C70 110 120 100 170 130" fill="none" stroke="#F7F7FA" stroke-opacity=".22"/>';
+for(let i=0;i<90;i++)s+=`<circle class="tw" cx="${(R()*400)|0}" cy="${(R()*400)|0}" r="${(.7+R()*1.1).toFixed(1)}" fill="#FFF4CD" opacity=".55" style="animation-delay:-${(R()*7).toFixed(1)}s"/>`;
+s+='<circle cx="200" cy="185" r="28" fill="url(#pg)"/><circle cx="200" cy="185" r="5" fill="#fff"/><circle class="pr" cx="200" cy="185" r="10" fill="none" stroke="#FFF4CD"/>';
+s+='<text x="216" y="172" fill="#F7F7FA" font-size="18" font-family="Hahmlet,serif" font-weight="300">수봉공원</text><text x="216" y="192" fill="#A99BE8" font-size="12" font-family="Cinzel,serif" letter-spacing="2">SOOBONG PARK</text>';
+s+='<text x="372" y="32" fill="#A99BE8" font-size="13" text-anchor="middle" font-family="Cinzel,serif">N</text><path d="M372 38v20M367 45l5-7 5 7" stroke="#A99BE8" fill="none"/><text x="200" y="386" fill="#A5A7B5" font-size="12" text-anchor="middle">개념도 · NOT TO SCALE</text>';
+$('#vm').innerHTML=s}vmap();
+/* 별자리 메이커 */
+let mode='solo',view=0,sel=[],locked=false,drawn=0,stars=[],W=0,H=0,cur=null,regd=0;
+const sky=$('#sky');
+function build(){const r=sky.getBoundingClientRect();W=r.width;H=r.height;sky.setAttribute('viewBox',`0 0 ${W} ${H}`);const R=rng(view*131+5);stars=[];let g=0;
+while(stars.length<52&&g++<1500){const a={x:6+(R()+R())/2*88,y:12+Math.pow(R(),.62)*78,r:1.6+R()*2.2};if(stars.every(s=>Math.hypot((s.x-a.x)*W/100,(s.y-a.y)*H/100)>34))stars.push(a)}
+sky.innerHTML='<defs><radialGradient id="gg"><stop offset="0" stop-color="#FFF4CD" stop-opacity=".9"/><stop offset="1" stop-color="#FFF4CD" stop-opacity="0"/></radialGradient></defs><g id="ln"></g>'+stars.map((s,i)=>`<g class="st" data-i="${i}" tabindex="0" role="button" aria-label="빛 ${i+1}" style="--d:${(5+R()*6).toFixed(1)}s;--dl:-${(R()*6).toFixed(1)}s" transform="translate(${(s.x*W/100).toFixed(1)} ${(s.y*H/100).toFixed(1)})"><circle class="hit" r="20"/><circle class="gl" r="${(s.r*5).toFixed(1)}"/><circle class="dot" r="${s.r.toFixed(1)}"/></g>`).join('')+'<g id="lbg"></g>';
+sel=[];locked=false;drawn=0;ui()}
+const fam=()=>mode==='fam';
+function ui(){const n=sel.length;$('#n').textContent=n;
+$('#hint').textContent=fam()?(['“첫 번째 별을 골라주세요.”','“두 번째 별을 골라주세요.”','“마지막 별을 골라주세요.”'][n]||'추가로 별을 더 고를 수 있어요. (최대 7개)'):(locked?'별이 이어졌어요. 별자리를 완성해 보세요.':n<3?'빛을 3개 이상 선택해 주세요.':'더 고르거나, 별을 연결해 보세요.');
+$('#bConn').hidden=fam()||locked;$('#bConn').disabled=n<3;$('#bDone').hidden=!(fam()?n>=3:locked);
+const st=(fam()?n>=3:locked)?1:0;$$('#prog i').forEach((e,i)=>e.classList.toggle('on',i<=st));
+$$('.st').forEach((g,i)=>g.classList.toggle('sel',sel.includes(i)));
+const L=['나의 별','우리 가족의 별','오늘의 기억'];$('#lbg').innerHTML=fam()?sel.slice(0,3).map((i,k)=>`<text class="lb" x="${stars[i].x*W/100}" y="${stars[i].y*H/100+28}">${L[k]}</text>`).join(''):''}
+function addLine(a,b,dl){const A=stars[a],B=stars[b],l=document.createElementNS(NS,'line');l.setAttribute('x1',A.x*W/100);l.setAttribute('y1',A.y*H/100);l.setAttribute('x2',B.x*W/100);l.setAttribute('y2',B.y*H/100);l.setAttribute('pathLength',1);l.setAttribute('class','ln');l.style.animationDelay=dl+'s';$('#ln').appendChild(l)}
+function syncLines(rm){if(rm){$('#ln').innerHTML='';drawn=0}const need=fam()&&sel.length>=3?sel.length-1:0;for(let i=drawn;i<need;i++)addLine(sel[i],sel[i+1],(i-drawn)*.6);drawn=Math.max(drawn,need)}
+let ac;function blip(f){try{ac=ac||new(window.AudioContext||webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.setValueAtTime(.04,ac.currentTime);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.6);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.6)}catch(e){}}
+function toggle(i){if(locked)return;const k=sel.indexOf(i);if(k>=0){sel.splice(k,1);syncLines(1)}else{if(sel.length>=7)return;sel.push(i);const s=stars[i],c=document.createElementNS(NS,'circle');c.setAttribute('cx',s.x*W/100);c.setAttribute('cy',s.y*H/100);c.setAttribute('class','rip');sky.appendChild(c);setTimeout(()=>c.remove(),1000);blip(480+sel.length*70);syncLines()}ui()}
+sky.addEventListener('click',e=>{const g=e.target.closest('.st');if(g)toggle(+g.dataset.i)});
+sky.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('.st');if(g){e.preventDefault();toggle(+g.dataset.i)}}});
+$$('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$$('[data-mode]').forEach(x=>x.classList.toggle('on',x==b));build()});
+$$('[data-v]').forEach(b=>b.onclick=()=>{view=+b.dataset.v;$$('[data-v]').forEach(x=>x.classList.toggle('on',x==b));build()});
+$('#bReset').onclick=build;
+$('#bConn').onclick=()=>{locked=true;for(let i=0;i<sel.length-1;i++)addLine(sel[i],sel[i+1],i*.6);ui()};
+$('#start').onclick=()=>{$('#stage').classList.add('on');build();$('#stage').scrollIntoView()};
+$('#again2').onclick=()=>{$('#start').click()};
+addEventListener('resize',()=>{if($('#stage').classList.contains('on')&&!sel.length)build()});
+function norm(){const p=sel.map(i=>[stars[i].x*W/100,stars[i].y*H/100]),xs=p.map(a=>a[0]),ys=p.map(a=>a[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),s=80/Math.max(x1-x0,y1-y0,40),cx=(x0+x1)/2,cy=(y0+y1)/2;return p.map(a=>({x:+(50+(a[0]-cx)*s).toFixed(1),y:+(50+(a[1]-cy)*s).toFixed(1)}))}
+function shapeSvg(el,pts,extra){let h='';pts.forEach((p,i)=>{if(i)h+=`<line class="ln" pathLength="1" style="animation-delay:${(i-1)*.7}s" x1="${pts[i-1].x}" y1="${pts[i-1].y}" x2="${p.x}" y2="${p.y}"/>`});pts.forEach(p=>h+=`<circle cx="${p.x}" cy="${p.y}" r="1.6"/>`);if(extra){const R=rng(21);for(let i=0;i<18;i++)h+=`<circle class="ex" style="animation-delay:${2+R()*1.5}s" cx="${(R()*130-15).toFixed(0)}" cy="${(R()*130-15).toFixed(0)}" r="${(.4+R()*.5).toFixed(1)}"/>`}el.innerHTML=h}
+$('#bDone').onclick=()=>{shapeSvg($('#pv'),norm());$('#nm').classList.add('on');setTimeout(()=>$('#nameIn').focus(),600);$$('#prog i').forEach((e,i)=>e.classList.toggle('on',i<=2))};
+
+/* 카드 렌더링 (1080×1350) */
+function drawCard(cv,c){const x=cv.getContext('2d'),w=1080,h=1350;cv.width=w;cv.height=h;const F='"Hahmlet","Noto Serif KR",serif',EN='"Cinzel",serif',HD='"Nanum Pen Script",cursive';
+const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#0D1025');g.addColorStop(1,'#161A38');x.fillStyle=g;x.fillRect(0,0,w,h);
+const R=rng(c.no||1);for(let i=0;i<130;i++){x.globalAlpha=R()*.6+.1;x.fillStyle='#F7F7FA';x.beginPath();x.arc(R()*w,R()*h,R()*1.8+.4,0,7);x.fill()}x.globalAlpha=1;
+x.strokeStyle='rgba(169,155,232,.35)';x.lineWidth=1;x.strokeRect(48,48,w-96,h-96);x.textAlign='center';
+const T=(t,y,f,col,ls)=>{x.font=f;x.fillStyle=col;try{x.letterSpacing=ls||'0px'}catch(e){}x.fillText(t,w/2,y)};
+T('SOOBONG CONSTELLATION',140,'400 26px '+EN,'#A99BE8','8px');T('NO. '+pad(c.no,6),186,'400 30px '+EN,'#F7F7FA','6px');
+x.save();x.shadowColor='#FFF4CD';x.shadowBlur=26;x.strokeStyle='rgba(255,244,205,.8)';x.lineWidth=2.5;x.fillStyle='#FFF4CD';const P=c.pts.map(p=>[260+p.x*5.6,260+p.y*5.6]);
+x.beginPath();P.forEach((p,i)=>i?x.lineTo(...p):x.moveTo(...p));x.stroke();P.forEach(p=>{x.beginPath();x.arc(p[0],p[1],8,0,7);x.fill()});x.restore();
+T(c.name,935,'300 88px '+F,'#FFF4CD','2px');T(c.date,1005,'400 30px '+EN,'#A5A7B5','6px');
+if(c.memory){const t='“'+c.memory+'”',ls=[];for(let i=0;i<t.length;i+=18)ls.push(t.slice(i,i+18));ls.forEach((l,i)=>T(l,1085+i*48,'400 46px '+HD,'#F7F7FA','1px'))}
+T('은하언덕 수봉',1230,'300 32px '+F,'#F7F7FA','8px');T('SOOBONG PLANETARIUM',1272,'400 22px '+EN,'#A99BE8','8px')}
+const withFont=(fn,t='')=>Promise.all(document.fonts?['300 30px "Hahmlet"','400 30px "Nanum Pen Script"','400 30px "Cinzel"'].map(f=>document.fonts.load(f,t+'SOOBONG CONSTELLATION PLANETARIUM NO.0123456789').catch(()=>{})):[]).then(fn);
+$('#bRev').onclick=()=>{const l=store.get(),no=BASE+l.length+1;cur={id:'SB-'+pad(no,6),no,name:$('#nameIn').value.trim()||'나의 수봉자리',memory:$('#memIn').value.trim(),date:TODAY,type:fam()?'family':'memory',pts:norm()};regd=0;
+$('#bReg').disabled=false;$('#bReg').textContent='수봉의 은하에 등록하기';$('#nm').classList.remove('on');$('#rv').classList.remove('done');
+withFont(()=>drawCard($('#cc'),cur),cur.name+cur.memory+'은하언덕 수봉SOOBONGCONSTELLATIONPLANETARIUM');shapeSvg($('#rvs'),cur.pts,1);$('#rv').classList.add('on');setTimeout(()=>$('#rv').classList.add('done'),3600);$$('#prog i').forEach(e=>e.classList.add('on'))};
+$('#bAgain').onclick=()=>{$('#rv').classList.remove('on');build();$('#stage').scrollIntoView()};
+$('#bImg').onclick=async()=>{const b=await new Promise(r=>$('#cc').toBlob(r,'image/png')),n='SOOBONG_CONSTELLATION_'+cur.name.replace(/[\s\\/:*?"<>|]+/g,'')+'.png';
+try{const d=window.claude&&await claude.use('downloads');if(d){await d.save({filename:n,data:b});return}}catch(e){if(e&&e.code==='declined')return}
+const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click()};
+
+/* 플라네타리움 */
+const gc=$('#gc'),gx=gc.getContext('2d'),WW=2600,WH=1500,cam={x:0,y:0,tx:0,ty:0};let GW,GH,mx=0,my=0,hov=null,filt='ALL',drag=null,pulse={id:null,t:0},all=[],BG=[],shown=BASE+store.get().length;
+const cX=v=>Math.max(0,Math.min(WW-GW,v)),cY=v=>Math.max(0,Math.min(WH-GH,v));
+const match=c=>filt==='ALL'||(filt==='TODAY'&&c.date===TODAY)||(filt==='FAMILY'&&c.type==='family')||(filt==='MEMORY'&&c.type==='memory');
+function layout(){all=[...DEMO,...store.get()].map((c,i)=>{if(i<DEMO.length){const R=rng(i+3);c.gx=260+(i%5)*520+R()*140;c.gy=230+Math.floor(i/5)*340+R()*100}else{const R=rng(c.no);c.gx=300+R()*(WW-600);c.gy=250+R()*(WH-500)}return c})}
+function gsize(){const r=gc.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);GW=r.width;GH=r.height;gc.width=GW*d;gc.height=GH*d;gx.setTransform(d,0,0,d,0,0);const R=rng(5);BG=Array.from({length:150},()=>({x:R()*GW*2,y:R()*GH*2,r:R()*1.2+.3,p:R()*6,s:R()*.6+.2}));cam.tx=cX(cam.tx||(WW-GW)/2);cam.ty=cY(cam.ty||(WH-GH)/2);if(!cam.x)cam.x=cam.tx,cam.y=cam.ty}
+function gdraw(t){requestAnimationFrame(gdraw);if(gc.getBoundingClientRect().bottom<0||gc.getBoundingClientRect().top>innerHeight)return;gx.clearRect(0,0,GW,GH);
+cam.x+=(cam.tx-cam.x)*.08;cam.y+=(cam.ty-cam.y)*.08;const px=(.5-mx/GW)*26,py=(.5-my/GH)*18;gx.fillStyle='#F7F7FA';
+for(const b of BG){gx.globalAlpha=.15+.3*(.5+.5*Math.sin(t/1000*b.s+b.p));gx.beginPath();gx.arc((((b.x-cam.x*.5+px*.4)%GW)+GW)%GW,(((b.y-cam.y*.5+py*.4)%GH)+GH)%GH,b.r,0,7);gx.fill()}
+for(const c of all){const ox=c.gx-cam.x+px+Math.sin(t/9000+c.gx)*10-110,oy=c.gy-cam.y+py+Math.cos(t/11000+c.gy)*8-110;c._cx=ox+110;c._cy=oy+110;c._v=!(ox<-250||ox>GW+30||oy<-250||oy>GH+30);if(!c._v)continue;
+const h=hov===c,pu=pulse.id===c.id?Math.max(0,1-(t-pulse.t)/6000):0;gx.globalAlpha=(match(c)?1:.12)*(h?1:.6+pu*.4);gx.shadowColor='#FFF4CD';gx.shadowBlur=h||pu?18:0;gx.strokeStyle='#FFF4CD';gx.fillStyle='#FFF4CD';gx.lineWidth=h?1.6:1;
+gx.beginPath();c.pts.forEach((p,i)=>{const X=ox+p.x*2.2,Y=oy+p.y*2.2;i?gx.lineTo(X,Y):gx.moveTo(X,Y)});gx.stroke();c.pts.forEach(p=>{gx.beginPath();gx.arc(ox+p.x*2.2,oy+p.y*2.2,h?3.4:2.3,0,7);gx.fill()});gx.shadowBlur=0}gx.globalAlpha=1}
+function pick(){let b=null,bd=95;for(const c of all){if(!c._v||!match(c))continue;const d=Math.hypot(mx-c._cx,my-c._cy);if(d<bd){bd=d;b=c}}hov=b;const tip=$('#tip');if(b){const r=gc.getBoundingClientRect();tip.innerHTML='<b style="font-weight:400"></b><br><small style="color:#A5A7B5"></small>';tip.firstChild.textContent=b.name;tip.lastChild.textContent=b.date;tip.style.left=Math.min(r.left+mx+16,innerWidth-190)+'px';tip.style.top=(r.top+my+16)+'px';tip.style.opacity=1}else tip.style.opacity=0}
+gc.addEventListener('pointerdown',e=>{const r=gc.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;drag={x:e.clientX,y:e.clientY,cx:cam.tx,cy:cam.ty,mv:0};gc.setPointerCapture(e.pointerId);pick()});
+gc.addEventListener('pointermove',e=>{const r=gc.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.mv=Math.max(drag.mv,Math.hypot(dx,dy));cam.tx=cX(drag.cx-dx);cam.ty=cY(drag.cy-dy)}pick()});
+gc.addEventListener('pointerup',()=>{if(drag&&drag.mv<6&&hov)openCard(hov);drag=null});gc.addEventListener('pointerleave',()=>{hov=null;$('#tip').style.opacity=0});
+gc.addEventListener('wheel',e=>{const sh=e.shiftKey,nx=cX(cam.tx+(sh?e.deltaY:e.deltaX)*.8),ny=cY(cam.ty+(sh?0:e.deltaY*.8));if(nx!==cam.tx||ny!==cam.ty){cam.tx=nx;cam.ty=ny;e.preventDefault()}},{passive:false});
+$$('#flt .pill').forEach(b=>b.onclick=()=>{filt=b.dataset.f;$$('#flt .pill').forEach(x=>x.classList.toggle('on',x==b))});
+function openCard(c){withFont(()=>drawCard($('#mc'),c),c.name+c.memory+'은하언덕 수봉SOOBONGCONSTELLATIONPLANETARIUM');$('#md').classList.add('on')}$('#mx').onclick=()=>$('#md').classList.remove('on');$('#md').onclick=e=>{if(e.target.id==='md')$('#md').classList.remove('on')};addEventListener('keydown',e=>{if(e.key==='Escape')$('#md').classList.remove('on')});
+function setCount(v){const a=shown,t0=performance.now();shown=v;(function f(t){const k=Math.min(1,(t-t0)/1400);$('#cnt').textContent=Math.round(a+(v-a)*k).toLocaleString('en-US');if(k<1)requestAnimationFrame(f)})(t0)}
+$('#bReg').onclick=()=>{if(regd||!cur)return;regd=1;const l=store.get();l.push(cur);store.set(l);$('#bReg').disabled=true;$('#bReg').textContent='등록 완료';
+setTimeout(()=>{$('#rv').classList.remove('on');layout();renderMem();const c=all[all.length-1];cam.tx=cX(c.gx-GW/2);cam.ty=cY(c.gy-GH/2);pulse={id:c.id,t:performance.now()};$('#galaxy').scrollIntoView();filt='ALL';$$('#flt .pill').forEach((x,i)=>x.classList.toggle('on',!i));
+setTimeout(()=>{setCount(BASE+l.length);$('#gmsg').style.opacity=1;setTimeout(()=>$('#gmsg').style.opacity=0,6000)},900);build()},700)};
+function renderMem(){const m=[...store.get().map(c=>c.memory),...DEMO.map(c=>c.memory)].filter(Boolean),h=m.map(t=>{const p=document.createElement('p');p.textContent='“'+t+'”';return p.outerHTML}).join('');$('#mf').innerHTML=h+h}
+let rt;$('#rst').onclick=()=>{const b=$('#rst');if(!b.dataset.s){b.dataset.s=1;b.textContent='한 번 더 누르면 초기화돼요';rt=setTimeout(()=>{delete b.dataset.s;b.textContent='내 별자리 초기화'},4000);return}clearTimeout(rt);delete b.dataset.s;b.textContent='내 별자리 초기화';try{localStorage.removeItem('soobong-c')}catch(e){}store.set([]);cur=null;layout();renderMem();cam.tx=cX((WW-GW)/2);cam.ty=cY((WH-GH)/2);pulse={id:null,t:0};hov=null;setCount(BASE);$('#gmsg').style.opacity=0};
+layout();gsize();addEventListener('resize',gsize);renderMem();$('#cnt').textContent=shown.toLocaleString('en-US');requestAnimationFrame(gdraw);
+</script></body></html>
